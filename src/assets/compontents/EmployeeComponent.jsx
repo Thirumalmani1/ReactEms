@@ -8,18 +8,51 @@ const EmployeeComponent = () => {
    const [lastName, setLastName] = useState('')
    const [email, setEmail] = useState('')
 
+   const [errors, setErrors] =useState({
+       firstName: '',
+       lastName: '',
+       email: ''
+   })
+
+   function validateForm() {
+       let isValid = true;
+       const errorCopy = {...errors};
+       if (firstName.trim()) {
+           errorCopy.firstName = '';
+       } else {
+            errorCopy.firstName = 'First Name is required';
+            isValid = false;
+       }
+       if(lastName.trim()) {
+           errorCopy.lastName = '';
+       } else {
+           errorCopy.lastName = 'Last Name is required';
+           isValid = false;
+       }
+       if(email.trim()) {
+           errorCopy.email = '';
+       } else {
+           errorCopy.email = 'Email is required';
+           isValid = false;
+       }
+       setErrors(errorCopy);
+       return isValid;
+    }
+
    const navigator = useNavigate();
 
   function saveEmployee (e) {
        e.preventDefault()
-       const employee = {firstName, lastName, email}
-       console.log(employee)
-       createEmployee(employee).then((response) => {
-         console.log(response.data);
-          navigator("/employees")
-       }).catch((error) => {
-           console.error(error);
-       });
+        if(validateForm()) {
+            const employee = {firstName, lastName, email}
+            console.log(employee)
+            createEmployee(employee).then((response) => {
+                console.log(response.data);
+                navigator("/employees")
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
    }
 
   return (
@@ -32,17 +65,23 @@ const EmployeeComponent = () => {
                     <form>
                         <div className='form-group mb-2'>
                             <label  className='form-label mb-2'>First Name: </label>
-                            <input type="text" name='firstName' placeholder='Enter First Name' value={firstName} onChange={(e) => setFirstName(e.target.value)} className='form-control'/>
+                            <input type="text" name='firstName' placeholder='Enter First Name' value={firstName} 
+                            onChange={(e) => setFirstName(e.target.value)} className={`form-control ${ errors.firstName ? 'is-invalid' : ''}`}/>
+                            {errors.firstName && <div className='invalid-feedback'>{errors.firstName}</div>}
                         </div>
 
                         <div className='form-group mb-2'>
                             <label  className='form-label mb-2'>Last Name: </label>
-                            <input type="text" name='lastName' placeholder='Enter Last Name' value={lastName} onChange={(e) => setLastName(e.target.value)} className='form-control'/>
+                            <input type="text" name='lastName' placeholder='Enter Last Name' value={lastName} 
+                            onChange={(e) => setLastName(e.target.value)} className={`form-control ${ errors.lastName ? 'is-invalid' : ''}`}/>
+                            {errors.lastName && <div className='invalid-feedback'>{errors.lastName}</div>}
                         </div>
 
                         <div className='form-group mb-2'>
                             <label  className='form-label mb-2'>Email: </label>
-                            <input type="email" name='email' placeholder='Enter Email' value={email} onChange={(e) => setEmail(e.target.value)} className='form-control'/>
+                            <input type="email" name='email' placeholder='Enter Email' value={email} 
+                            onChange={(e) => setEmail(e.target.value)} className={`form-control ${ errors.email ? 'is-invalid' : ''}`}/>
+                            {errors.email && <div className='invalid-feedback'>{errors.email}</div>}
                         </div>
                         <div className="col text-center">
                           <button type='submit' className='btn btn-success center mt-2' onClick={saveEmployee} >Submit</button>
