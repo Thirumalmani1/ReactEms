@@ -1,21 +1,38 @@
 import React,{useEffect, useState} from 'react'
-import { listEmployees } from '../services/EmployeeService'
+import { listEmployees, deleteEmployee } from '../services/EmployeeService'
 import { useNavigate } from 'react-router-dom'
 
 const ListEmployeeComponent = () => {
    const [employees,setEmployees] = useState([])
    useEffect(() => {
-       listEmployees().then((response) => {
-           setEmployees(response.data);
-       }).catch((error) => {
-           console.error(error);
-       })
+      getAllEmployees()
    },[])
+
+   function getAllEmployees()  {
+    listEmployees().then((response) => {
+        setEmployees(response.data);
+    }).catch((error) => {
+        console.error(error);
+    })
+   }
 
    const navigator = useNavigate();
    
    function addNewEmployee(){
         navigator('/add-employee')
+   }
+
+   function updateEmployee(id){ 
+       navigator(`/edit-employee/${id}`)
+   }
+
+   function removeEmployee(id){
+        deleteEmployee(id).then((response) => {
+            console.log(response.data);
+            getAllEmployees()
+        }).catch((error) => {
+            console.error(error);
+        })
    }
    
   return (
@@ -29,6 +46,7 @@ const ListEmployeeComponent = () => {
                     <th>First Name</th>
                     <th>Last Name</th>
                     <th>Email</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,6 +56,10 @@ const ListEmployeeComponent = () => {
                         <td>{item.firstName}</td>
                         <td>{item.lastName}</td>
                         <td>{item.email}</td>
+                        <td>
+                            <button className='btn btn-info' onClick={() => updateEmployee(item.id)}>Update</button>
+                            <button className='btn btn-danger' onClick={() => removeEmployee(item.id)} style={{marginLeft:"10px"}}>Delete</button>
+                        </td>
                     </tr>
                 ))}
             </tbody>
